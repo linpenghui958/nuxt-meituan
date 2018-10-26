@@ -10,7 +10,7 @@
         <user />
       </el-col>
       <el-col :span="14">
-        <nav />
+        <header-nav />
       </el-col>
     </el-row>
   </div>
@@ -24,10 +24,11 @@ export default {
   components: {
     Geo,
     User,
-    Nav
+    HeaderNav: Nav
   }
 }
 </script>
 
 <style lang="scss">
+@import '@/assets/css/public/header/index.scss';
 </style>

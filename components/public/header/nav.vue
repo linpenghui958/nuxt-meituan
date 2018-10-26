@@ -1,6 +1,5 @@
 <template>
   <div class="m-nav">
-    123
     <ul class="nav">
       <li class="list">
         <nuxt-link to="/my">我的美团</nuxt-link>
