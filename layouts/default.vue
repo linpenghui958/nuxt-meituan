@@ -6,15 +6,19 @@
     <el-main>
       <nuxt />
     </el-main>
-    <el-footer>footer</el-footer>
+    <el-footer>
+      <home-footer></home-footer>
+    </el-footer>
   </el-container>
 </template>
 
 <script>
 import HomeHeader from '@/components/public/header/index'
+import HomeFooter from '@/components/public/footer/index.vue'
 export default {
   components: {
-    HomeHeader
+    HomeHeader,
+    HomeFooter
   }
 }
 </script>
