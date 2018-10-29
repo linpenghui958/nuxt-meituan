@@ -60,6 +60,7 @@ module.exports = {
     /*
     ** You can extend webpack config here
     */
+    cache: false,
     extend(config, ctx) {
       // Run ESLint on save
       if (ctx.isDev && ctx.isClient) {
