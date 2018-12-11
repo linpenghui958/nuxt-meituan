@@ -18,3 +18,13 @@ passport.use(
       return done(null, false, '用户不存在')
     }
 }))
+
+passport.serializeUser(function(user, done) {
+  done(null, user)
+})
+
+passport.deserializeUser(function (user, done) {
+  return done(null, user)
+})
+
+export default passport
