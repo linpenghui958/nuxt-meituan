@@ -25,7 +25,7 @@
         <el-form-item
           label="昵称"
           prop="name">
-          <el-input v-model="ruleForm.name" />
+          <el-input v-model="ruleForm.username" />
         </el-form-item>
         <el-form-item
           label="邮箱"
@@ -76,6 +76,7 @@
 </template>
 
 <script>
+import CryptoJS from 'crypto-js'
 export default {
   layout: 'blank',
   data() {
@@ -83,14 +84,14 @@ export default {
       statusMsg: '',
       error: '',
       ruleForm: {
-        name: '',
+        username: '',
         code: '',
         pwd: '',
         cpwd: '',
         email: ''
       },
       rules: {
-        name: [
+        username: [
           {
             required: true,
             type: 'string',
@@ -113,7 +114,7 @@ export default {
             trigger: 'blur'
           }
         ],
-        pwd: [
+        cpwd: [
           {
             required: true,
             message: '确认密码',
@@ -123,7 +124,7 @@ export default {
             validator: (rule, value, callback) => {
               if (value === '') {
                 callback(new Error('请再次输入密码'))
-              } else if (value !== this.ruleForm.pwd()) {
+              } else if (value !== this.ruleForm.pwd) {
                 callback(new Error('两次输入密码不一致'))
               } else {
                 callback()
@@ -152,7 +153,7 @@ export default {
       })
       if (!namePass && !emailPass) {
         this.$axios.post('/users/verify', {
-          username: encodeURIComponent(this.ruleForm.name),
+          username: encodeURIComponent(this.ruleForm.username),
           email: this.ruleForm.email
         })
         .then(({ status, data}) => {
@@ -172,7 +173,33 @@ export default {
         })
       }
     },
-    register() {}
+    register() {
+      this.$refs['ruleForm'].validate( valid => {
+        if (valid) {
+          this.$axios.post('/users/signup', {
+            username: encodeURIComponent(this.ruleForm.username),
+            password:  CryptoJS.MD5(this.ruleForm.password).toString(),
+            email: this.ruleForm.email,
+            code: this.ruleForm.code
+          })
+          .then( ({ status, data }) => {
+            console.log(status, data)
+            if (status === 200) {
+              if (data && data.code == 0) {
+                location.href = '/login'
+              } else {
+                this.error = data.msg
+              }
+            } else {
+              this.error = `服务器出错，错误码${status}`
+            }
+            setTimeout(() => {
+              this.error = ''
+            }, 3500)
+          })
+        }
+      })
+    }
   }
 }
 </script>

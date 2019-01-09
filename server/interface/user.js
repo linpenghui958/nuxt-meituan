@@ -13,8 +13,7 @@ let router = new Router({
 let Store = new Redis().client
 
 router.post('/signup', async (ctx) => {
-  const { username, password, eamil, code } = ctx.request.body
-
+  const { username, password, email, code } = ctx.request.body
   if (code) {
     const saveCode = await Store.hget(`nodemail:${username}`, 'code')
     const saveExpires = await Store.hget(`nodemail:${username}`, 'expires')
@@ -39,7 +38,7 @@ router.post('/signup', async (ctx) => {
     }
   }
 
-  let hasUser = User.find({
+  let hasUser = await User.find({
     username
   })
   if (hasUser.length) {
@@ -50,6 +49,7 @@ router.post('/signup', async (ctx) => {
     return
   }
   let newUser = await User.create({ username, password, email })
+  console.log(newUser)
   if (newUser) {
     let res = await axios.post('/users/signin', { username, password })
     if (res.data && res.data.code === 0) {
@@ -78,12 +78,13 @@ router.post('/signin', async (ctx, next) => {
       if (user) {
         ctx.body = {
           code: 0,
-          msg: '登陆成功'
+          msg: '登陆成功',
+          user
         }
         return ctx.login(user)
       } else {
         ctx.body = {
-          code: -1,
+          code: 1,
           msg: info
         }
       }
