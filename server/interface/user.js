@@ -10,7 +10,7 @@ let router = new Router({
   prefix: '/users'
 })
 
-let Store = new Redis().client()
+let Store = new Redis().client
 
 router.post('/signup', async (ctx) => {
   const { username, password, eamil, code } = ctx.request.body
@@ -67,7 +67,7 @@ router.post('/signup', async (ctx) => {
   }
 })
 
-router.post('/signin'. async (ctx, next) => {
+router.post('/signin', async (ctx, next) => {
   return Passport.authenticate('local', (err, user, info, status) => {
     if (err) {
       ctx.body = {
@@ -103,13 +103,13 @@ router.post('/verify', async (ctx, next) => {
   })
   const ko = {
     code: Email.smtp.code(),
-    expires: Email.smtp.expires(),
+    expires: Email.smtp.expire(),
     email: ctx.request.body.email,
     user: ctx.request.body.username
   }
   const mailOptions = {
     from: `认证邮件 <${Email.smtp.user}>`,
-    to: ko.eamil,
+    to: ko.email,
     subject: '测试注册码',
     html: `您的注册码为${ko.code}`
   }
