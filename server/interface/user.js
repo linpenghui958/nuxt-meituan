@@ -49,7 +49,6 @@ router.post('/signup', async (ctx) => {
     return
   }
   let newUser = await User.create({ username, password, email })
-  console.log(newUser)
   if (newUser) {
     let res = await axios.post('/users/signin', { username, password })
     if (res.data && res.data.code === 0) {
@@ -68,7 +67,7 @@ router.post('/signup', async (ctx) => {
 })
 
 router.post('/signin', async (ctx, next) => {
-  return Passport.authenticate('local', (err, user, info, status) => {
+  return Passport.authenticate('local', function(err, user, info, status) {
     if (err) {
       ctx.body = {
         code: -1,
@@ -78,7 +77,7 @@ router.post('/signin', async (ctx, next) => {
       if (user) {
         ctx.body = {
           code: 0,
-          msg: '登陆成功',
+          msg: '登录成功',
           user
         }
         return ctx.login(user)
