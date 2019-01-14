@@ -55,108 +55,7 @@ export default {
     return {
       kind: 'all',
       // prettier-ignore
-      list: {
-        all: [
-          {
-            title: '第六季自助餐厅（王府井店）',
-            img: '//p1.meituan.net/msmerchant/29b5616cf872a3a526cec84a97e72936166165.jpg@368w_208h_1e_1c',
-            pos: '单人限时抢购自助',
-            price: '298'
-          },
-          {
-            title: '祈年八号中餐厅',
-            img: '//p0.meituan.net/mogu/fc091566222b23c51857ab4316633e43370925.jpg@368w_208h_1e_1c',
-            pos: '单人点心自助午餐',
-            price: '92'
-          },
-          {
-            title: '祈年八号中餐厅01',
-            img: '//p0.meituan.net/mogu/fc091566222b23c51857ab4316633e43370925.jpg@368w_208h_1e_1c',
-            pos: '单人点心自助午餐',
-            price: '92'
-          }
-        ],
-        part: [
-          {
-            title: '第六季自助餐厅（王府井店）01',
-            img: '//p1.meituan.net/msmerchant/29b5616cf872a3a526cec84a97e72936166165.jpg@368w_208h_1e_1c',
-            pos: '单人限时抢购自助',
-            price: '298'
-          },
-          {
-            title: '祈年八号中餐厅02',
-            img: '//p0.meituan.net/mogu/fc091566222b23c51857ab4316633e43370925.jpg@368w_208h_1e_1c',
-            pos: '单人点心自助午餐',
-            price: '92'
-          },
-          {
-            title: '祈年八号中餐厅03',
-            img: '//p0.meituan.net/mogu/fc091566222b23c51857ab4316633e43370925.jpg@368w_208h_1e_1c',
-            pos: '单人点心自助午餐',
-            price: '92'
-          }
-        ],
-        spa: [
-          {
-            title: '第六季自助餐厅（王府井店）001',
-            img: '//p1.meituan.net/msmerchant/29b5616cf872a3a526cec84a97e72936166165.jpg@368w_208h_1e_1c',
-            pos: '单人限时抢购自助',
-            price: '298'
-          },
-          {
-            title: '祈年八号中餐厅002',
-            img: '//p0.meituan.net/mogu/fc091566222b23c51857ab4316633e43370925.jpg@368w_208h_1e_1c',
-            pos: '单人点心自助午餐',
-            price: '92'
-          },
-          {
-            title: '祈年八号中餐厅003',
-            img: '//p0.meituan.net/mogu/fc091566222b23c51857ab4316633e43370925.jpg@368w_208h_1e_1c',
-            pos: '单人点心自助午餐',
-            price: '92'
-          }
-        ],
-        movie: [
-          {
-            title: '第六季自助餐厅（王府井店）0001',
-            img: '//p1.meituan.net/msmerchant/29b5616cf872a3a526cec84a97e72936166165.jpg@368w_208h_1e_1c',
-            pos: '单人限时抢购自助',
-            price: '298'
-          },
-          {
-            title: '祈年八号中餐厅0002',
-            img: '//p0.meituan.net/mogu/fc091566222b23c51857ab4316633e43370925.jpg@368w_208h_1e_1c',
-            pos: '单人点心自助午餐',
-            price: '92'
-          },
-          {
-            title: '祈年八号中餐厅0003',
-            img: '//p0.meituan.net/mogu/fc091566222b23c51857ab4316633e43370925.jpg@368w_208h_1e_1c',
-            pos: '单人点心自助午餐',
-            price: '92'
-          }
-        ],
-        travel: [
-          {
-            title: '第六季自助餐厅（王府井店）00001',
-            img: '//p1.meituan.net/msmerchant/29b5616cf872a3a526cec84a97e72936166165.jpg@368w_208h_1e_1c',
-            pos: '单人限时抢购自助',
-            price: '298'
-          },
-          {
-            title: '祈年八号中餐厅00002',
-            img: '//p0.meituan.net/mogu/fc091566222b23c51857ab4316633e43370925.jpg@368w_208h_1e_1c',
-            pos: '单人点心自助午餐',
-            price: '92'
-          },
-          {
-            title: '祈年八号中餐厅00003',
-            img: '//p0.meituan.net/mogu/fc091566222b23c51857ab4316633e43370925.jpg@368w_208h_1e_1c',
-            pos: '单人点心自助午餐',
-            price: '92'
-          }
-        ]
-      }
+      list: {}
     }
   },
   computed: {
@@ -164,12 +63,55 @@ export default {
       return this.list[this.kind]
     }
   },
+  async mounted(){
+    let {status,data:{count,pois}}=await this.$axios.get('/search/resultsByKeywords',{
+      params:{
+        keyword:'景点',
+        city:this.$store.state.geo.position.city
+      }
+    })
+    if(status===200&&count>0){
+      let r= pois.filter(item=>item.photos.length).map(item=>{
+        return {
+          title:item.name,
+          pos:item.type.split(';')[0],
+          price:item.biz_ext.cost||'暂无',
+          img:item.photos[0].url,
+          url:'//abc.com'
+        }
+      })
+      this.list[this.kind]=r.slice(0,9)
+    }else{
+      this.list[this.kind]=[]
+    }
+  },
   methods: {
-    over(e) {
+    async over(e) {
       let dom = e.target
       let tag = dom.tagName.toLowerCase()
       if (tag === 'dd') {
         this.kind = dom.getAttribute('kind')
+        let keyword = dom.getAttribute('keyword')
+        let { status, data: { count, pois }} = await this.$axios.get('/search/resultsByKeywords', {
+          params: {
+            keyword,
+            city: this.$store.state.geo.position.city
+          }
+        })
+        if (status === 200 && count > 0) {
+          let r = pois.filter(item => item.photos.length).map(item => {
+            return {
+              title:item.name,
+              pos:item.type.split(';')[0],
+              price:item.biz_ext.cost||'暂无',
+              img:item.photos[0].url,
+              url:'//abc.com'
+            }
+          })
+          this.list[this.kind] = r.slice(0, 9)
+        } else {
+          this.list[this.kind] = []
+        }
       }
     }
   }
